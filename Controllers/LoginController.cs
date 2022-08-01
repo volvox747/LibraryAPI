@@ -25,7 +25,7 @@ namespace LibraryAPI.Controllers
 
         public IActionResult Login(LoginModel login)
         {
-            string query = @"select RegEmail,Password from Register where RegEmail='" + login.LoginEmail + @"'";
+            string query = @"select * from Register where RegEmail='" + login.LoginEmail + @"'";
             string dataBaseSource = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
             // creating a list to store the data
             List<LoginModel> list = new List<LoginModel>();
@@ -41,11 +41,14 @@ namespace LibraryAPI.Controllers
                     while(dbReader.Read())
                     {
                         row = new LoginModel();
-                        row.LoginEmail = dbReader.GetValue(0).ToString();
-                        row.LoginPassword = dbReader.GetValue(1).ToString();
+                        row.LoginId = dbReader.GetValue(0).ToString();
+                        row.LoginName = dbReader.GetValue(1).ToString();
+                        row.LoginEmail = dbReader.GetValue(2).ToString();
+                        row.PhoneNumber = Convert.ToString(dbReader.GetValue(3));
+                        row.LoginPassword = dbReader.GetValue(4).ToString();
                         if(login.LoginPassword == row.LoginPassword)
                         {
-                            return LocalRedirect("/books");
+                            list.Add(row);
                         }
                     }
                 }
@@ -80,9 +83,9 @@ namespace LibraryAPI.Controllers
                             bookRow.Author = myReader.GetValue(2).ToString();
                             bookRow.PublishDate = myReader.GetValue(3).ToString();
                             bookRow.Quantity = Convert.ToInt32(myReader.GetValue(4));
-                            bookRow.Description = myReader.GetValue(6).ToString();
-                            bookRow.Category = myReader.GetValue(7).ToString();
-                            bookRow.BookImageUrl = myReader.GetValue(8).ToString();
+                            bookRow.Category = myReader.GetValue(5).ToString();
+                            bookRow.BookImageUrl = myReader.GetValue(6).ToString();
+                            bookRow.Description = myReader.GetValue(7).ToString();
                             bookRow.Language = myReader.GetValue(10).ToString();
                             bookList.Add(bookRow);
                         }
@@ -92,5 +95,77 @@ namespace LibraryAPI.Controllers
                 return Ok(bookList);             
             }
         }
+
+        [HttpPost("/request-book")]
+
+        public JsonResult RequestBook(RequestModel req)
+        {
+            string query = @"insert into Request (ReqId,RegId,BookId) values (@ReqId,@RegId,@BookId)";
+            string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            using(SqlConnection serverConnection = new SqlConnection(databaseConnectionString))
+            {
+                serverConnection.Open();
+                using (SqlCommand command = new SqlCommand(query, serverConnection))
+                {
+                    command.Parameters.Add(new SqlParameter("ReqId", req.ReqId));
+                    command.Parameters.Add(new SqlParameter("RegId", req.RegId));
+                    command.Parameters.Add(new SqlParameter("BookId", req.BookId));
+                    command.ExecuteNonQuery();
+                }
+                serverConnection.Close();
+            }
+            return new JsonResult("Book Requested");
+        }
+
+
+        
+        
+        [HttpPost("/register")]
+
+        public JsonResult Register(RegisterModel reg)
+        {
+            string query = @"insert into Register values (@RegId,@RegName,@RegEmail,@PhoneNumber,@Password)";
+            string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            using (SqlConnection serverConnection = new SqlConnection(databaseConnectionString))
+            {
+                serverConnection.Open();
+                using (SqlCommand command = new SqlCommand(query, serverConnection))
+                {
+                    command.Parameters.Add(new SqlParameter("RegId", reg.RegId));
+                    command.Parameters.Add(new SqlParameter("RegName", reg.RegName));
+                    command.Parameters.Add(new SqlParameter("RegEmail", reg.RegEmail));
+                    command.Parameters.Add(new SqlParameter("PhoneNumber", reg.PhoneNumber));
+                    command.Parameters.Add(new SqlParameter("Password", reg.Password));
+                    command.ExecuteNonQuery();
+                }
+
+            serverConnection.Close();
+            }
+            return new JsonResult("Successfully Registered");
+        }
+
+
+        
+
+
+        //[HttpPost("/regist")]
+
+        //public ActionResult Regist(RegisterModel reg)
+        //{
+        //    string query = @"insert into Register(RegId,RegName,RegEmail,PhoneNumber,Password) values('" + reg.RegId + @"," + reg.RegName + @"," + reg.RegEmail + @"," + reg.PhoneNumber + @"," + reg.Password + @"')";
+        //    string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+        //    SqlDataReader myReader;
+        //    using (SqlConnection serverConnection = new SqlConnection(databaseConnectionString))
+        //    {
+        //        serverConnection.Open();
+        //        using (SqlCommand command = new SqlCommand(query, serverConnection))
+        //        {
+        //            myReader = command.ExecuteReader();
+        //            myReader.Close();
+        //        }
+        //        serverConnection.Close();
+        //    }
+        //    return Ok("Successfully Registered");
+        //}
     }
 }
