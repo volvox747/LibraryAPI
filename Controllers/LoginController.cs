@@ -78,7 +78,7 @@ namespace LibraryAPI.Controllers
                         while(myReader.Read())
                         {
                             bookRow = new BookModel();
-                            bookRow.BookId = Convert.ToInt32(myReader.GetValue(0));
+                            bookRow.BookId = myReader.GetValue(0).ToString();
                             bookRow.BookName = myReader.GetValue(1).ToString();
                             bookRow.Author = myReader.GetValue(2).ToString();
                             bookRow.PublishDate = myReader.GetValue(3).ToString();
@@ -144,8 +144,33 @@ namespace LibraryAPI.Controllers
             return new JsonResult("Successfully Registered");
         }
 
+        [HttpPost("/add-book")]
 
-        
+        public IActionResult AddBook(BookModel book)
+        {
+            string insertQuery = @"insert into Book values(@BookId,@BookName,@Author,@PublishDate,@Quantity,@Category,@BookImageUrl,@Description,@LangId)";
+            string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            using (SqlConnection serverConnection = new SqlConnection(databaseConnectionString))
+            {
+                serverConnection.Open();
+                using (SqlCommand command = new SqlCommand(insertQuery, serverConnection))
+                {
+                    command.Parameters.Add(new SqlParameter("BookId", book.BookId));
+                    command.Parameters.Add(new SqlParameter("BookName", book.BookName));
+                    command.Parameters.Add(new SqlParameter("Author", book.Author));
+                    command.Parameters.Add(new SqlParameter("PublishDate", book.PublishDate));
+                    command.Parameters.Add(new SqlParameter("Quantity", Convert.ToInt32(book.Quantity)));
+                    command.Parameters.Add(new SqlParameter("Category", book.Category));
+                    command.Parameters.Add(new SqlParameter("BookImageUrl", book.BookImageUrl));
+                    command.Parameters.Add(new SqlParameter("Description", book.Description));
+                    command.Parameters.Add(new SqlParameter("LangId", book.LangId));
+                    command.ExecuteNonQuery();
+                }
+
+                serverConnection.Close();
+            }
+            return new JsonResult("Book Added Successfully");
+        }
 
 
         //[HttpPost("/regist")]
