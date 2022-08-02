@@ -203,6 +203,39 @@ namespace LibraryAPI.Controllers
         }
 
 
+        [HttpDelete("/delete-book/{bookId}")]
+
+        public JsonResult DeleteBook(string bookId)
+        {
+            if(bookId.Length!=0)
+            {
+
+            string deleteQuery = @"Delete from Book where BookId = @BookId";
+            string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            using (SqlConnection serverConnection = new SqlConnection(databaseConnectionString))
+            {
+                serverConnection.Open();
+                using (SqlCommand command = new SqlCommand(deleteQuery, serverConnection))
+                {
+                    command.Parameters.Add(new SqlParameter("BookId", bookId));
+                    command.ExecuteNonQuery();
+                }
+
+                serverConnection.Close();
+            }
+            return new JsonResult("Book Deleted Successfully");
+            }
+            return new JsonResult("Id not Found");
+        }
+
+        [HttpGet("/request-books")]
+
+        public IActionResult RequestedBooks()
+        {
+            string query = @"select * from Request inner join Register on Request.RegId=Register.RegId inner join Book on Request.BookId=Book.BookId";
+
+        }
+
         //[HttpPost("/regist")]
 
         //public ActionResult Regist(RegisterModel reg)
