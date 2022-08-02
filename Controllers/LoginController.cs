@@ -23,12 +23,12 @@ namespace LibraryAPI.Controllers
 
         [HttpPost("~/login")]
 
-        public IActionResult Login(LoginModel login)
+        public IActionResult Login(UserModel login)
         {
             string query = @"select * from Register where RegEmail='" + login.LoginEmail + @"'";
             string dataBaseSource = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
             // creating a list to store the data
-            List<LoginModel> list = new List<LoginModel>();
+            List<UserModel> list = new List<UserModel>();
             // we cannot create obj for SqldataReader ,it is created when SqlDataReader.ExecuteReader iin an during runtime.
             SqlDataReader dbReader;
             using (SqlConnection serverConnection = new SqlConnection(dataBaseSource))
@@ -36,17 +36,17 @@ namespace LibraryAPI.Controllers
                 serverConnection.Open();
                 using (SqlCommand command = new SqlCommand(query, serverConnection))
                 {
-                    LoginModel row = null;
+                    UserModel row = null;
                     dbReader = command.ExecuteReader();
                     while(dbReader.Read())
                     {
-                        row = new LoginModel();
+                        row = new UserModel();
                         row.LoginId = dbReader.GetValue(0).ToString();
                         row.LoginName = dbReader.GetValue(1).ToString();
                         row.LoginEmail = dbReader.GetValue(2).ToString();
                         row.PhoneNumber = Convert.ToString(dbReader.GetValue(3));
-                        row.LoginPassword = dbReader.GetValue(4).ToString();
-                        if(login.LoginPassword == row.LoginPassword)
+                        row.Password = dbReader.GetValue(4).ToString();
+                        if(login.Password == row.Password)
                         {
                             list.Add(row);
                         }
@@ -86,6 +86,7 @@ namespace LibraryAPI.Controllers
                             bookRow.Category = myReader.GetValue(5).ToString();
                             bookRow.BookImageUrl = myReader.GetValue(6).ToString();
                             bookRow.Description = myReader.GetValue(7).ToString();
+                            bookRow.LangId = myReader.GetValue(8).ToString();
                             bookRow.Language = myReader.GetValue(10).ToString();
                             bookList.Add(bookRow);
                         }
@@ -122,7 +123,7 @@ namespace LibraryAPI.Controllers
         
         [HttpPost("/register")]
 
-        public JsonResult Register(RegisterModel reg)
+        public JsonResult Register(UserModel reg)
         {
             string query = @"insert into Register values (@RegId,@RegName,@RegEmail,@PhoneNumber,@Password)";
             string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
@@ -131,9 +132,9 @@ namespace LibraryAPI.Controllers
                 serverConnection.Open();
                 using (SqlCommand command = new SqlCommand(query, serverConnection))
                 {
-                    command.Parameters.Add(new SqlParameter("RegId", reg.RegId));
-                    command.Parameters.Add(new SqlParameter("RegName", reg.RegName));
-                    command.Parameters.Add(new SqlParameter("RegEmail", reg.RegEmail));
+                    command.Parameters.Add(new SqlParameter("RegId", reg.LoginId));
+                    command.Parameters.Add(new SqlParameter("RegName", reg.LoginName));
+                    command.Parameters.Add(new SqlParameter("RegEmail", reg.LoginEmail));
                     command.Parameters.Add(new SqlParameter("PhoneNumber", reg.PhoneNumber));
                     command.Parameters.Add(new SqlParameter("Password", reg.Password));
                     command.ExecuteNonQuery();
@@ -170,6 +171,35 @@ namespace LibraryAPI.Controllers
                 serverConnection.Close();
             }
             return new JsonResult("Book Added Successfully");
+        }
+
+
+        [HttpPut("/update-book")]
+
+        public JsonResult UpdateBook(BookModel book)
+        {
+            string updateQuery = @"update Book set BookName=@BookName, Author=@Author,PublishDate=@PublishDate,Quantity=@Quantity, Category=@Category,BookImageUrl=@BookImageUrl,Description=@Description,LangId=@LangId where [BookId]=@BookId" ;
+            string databaseConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            using (SqlConnection serverConnection = new SqlConnection(databaseConnectionString))
+            {
+                serverConnection.Open();
+                using (SqlCommand command = new SqlCommand(updateQuery, serverConnection))
+                {
+                    command.Parameters.Add(new SqlParameter("BookId", book.BookId));
+                    command.Parameters.Add(new SqlParameter("BookName", book.BookName));
+                    command.Parameters.Add(new SqlParameter("Author", book.Author));
+                    command.Parameters.Add(new SqlParameter("PublishDate", book.PublishDate));
+                    command.Parameters.Add(new SqlParameter("Quantity", Convert.ToInt32(book.Quantity)));
+                    command.Parameters.Add(new SqlParameter("Category", book.Category));
+                    command.Parameters.Add(new SqlParameter("BookImageUrl", book.BookImageUrl));
+                    command.Parameters.Add(new SqlParameter("Description", book.Description));
+                    command.Parameters.Add(new SqlParameter("LangId", book.LangId));
+                    command.ExecuteNonQuery();
+                }
+
+                serverConnection.Close();
+            }
+            return new JsonResult("Book Updated Successfully");
         }
 
 
