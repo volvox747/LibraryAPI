@@ -232,8 +232,91 @@ namespace LibraryAPI.Controllers
 
         public IActionResult RequestedBooks()
         {
-            string query = @"select * from Request inner join Register on Request.RegId=Register.RegId inner join Book on Request.BookId=Book.BookId";
+            string query = @"select * 
+                            from Request 
+                            inner join Register on Request.RegId=Register.RegId 
+                            inner join Book on Request.BookId=Book.BookId 
+                            inner join Language on Book.LangId=Language.LangId";
+            string serverConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            SqlDataReader sqlDataReader;
+            long i = 0;
+            List<RequestBooksModel> list = new List<RequestBooksModel>();
+            using(SqlConnection serverConnection = new SqlConnection(serverConnectionString))
+            {
+                serverConnection.Open();
+                using(SqlCommand cmd=new SqlCommand(query, serverConnection))
+                {
+                    sqlDataReader = cmd.ExecuteReader();
+                    RequestBooksModel reqBook;
+                    if(sqlDataReader.HasRows)
+                    {
+                        while(sqlDataReader.Read())
+                        {
+                            reqBook = new RequestBooksModel();
+                            reqBook.ReqId = (string)sqlDataReader[0];
+                            reqBook.LoginId = (string)sqlDataReader[1];
+                            reqBook.BookId = (string)sqlDataReader[2];
+                            reqBook.LoginEmail = (string)sqlDataReader[5];
+                            reqBook.PhoneNumber = (string)sqlDataReader[6];
+                            reqBook.BookName = (string)sqlDataReader[9];
+                            reqBook.Author = (string)sqlDataReader[10];
+                            reqBook.Category = (string)sqlDataReader[13];
+                            reqBook.BookImageUrl = (string)sqlDataReader[14];
+                            reqBook.LangId = (string)sqlDataReader[17];
+                            reqBook.Language = (string)sqlDataReader[18];
+                            list.Add(reqBook);
+                        }
+                    }
+                }
+                serverConnection.Close();
+            }
+            return Ok(list);
+        }
+        
+        [HttpGet("/request-books/{regId}")]
 
+        public IActionResult RequestedBooks(string regId)
+        {
+            string query = @"select * 
+                            from Request 
+                            inner join Register on Request.RegId=Register.RegId 
+                            inner join Book on Request.BookId=Book.BookId 
+                            inner join Language on Book.LangId=Language.LangId
+                            where Request.RegId=@RegId";
+            string serverConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
+            SqlDataReader sqlDataReader;
+            List<RequestBooksModel> list = new List<RequestBooksModel>();
+            using(SqlConnection serverConnection = new SqlConnection(serverConnectionString))
+            {
+                serverConnection.Open();
+                using(SqlCommand cmd=new SqlCommand(query, serverConnection))
+                {
+                    cmd.Parameters.Add(new SqlParameter("RegId", regId));
+                    sqlDataReader = cmd.ExecuteReader();
+                    RequestBooksModel reqBook;
+                    if(sqlDataReader.HasRows)
+                    {
+                        while(sqlDataReader.Read())
+                        {
+                            reqBook = new RequestBooksModel();
+                            reqBook.ReqId = (string)sqlDataReader[0];
+                            reqBook.LoginId = (string)sqlDataReader[1];
+                            reqBook.BookId = (string)sqlDataReader[2];
+                            reqBook.LoginEmail = (string)sqlDataReader[5];
+                            reqBook.PhoneNumber = (string)sqlDataReader[6];
+                            reqBook.BookName = (string)sqlDataReader[9];
+                            reqBook.Author = (string)sqlDataReader[10];
+                            reqBook.Category = (string)sqlDataReader[13];
+                            reqBook.BookImageUrl = (string)sqlDataReader[14];
+                            reqBook.LangId = (string)sqlDataReader[17];
+                            reqBook.Language = (string)sqlDataReader[18];
+                            list.Add(reqBook);
+                        }
+                    }
+                }
+                serverConnection.Close();
+            }
+            return Ok(list);
         }
 
         //[HttpPost("/regist")]
