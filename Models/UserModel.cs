@@ -7,5 +7,6 @@
         public string LoginEmail { get; set; }
         public string PhoneNumber { get; set; }
         public string Password { get; set; }
+        public object token { get; set; }
     }
 }

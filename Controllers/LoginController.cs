@@ -6,6 +6,10 @@ using System.Data;
 using LibraryAPI.Models;
 using System.Collections.Generic;
 using System;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace LibraryAPI.Controllers
 {
@@ -48,6 +52,18 @@ namespace LibraryAPI.Controllers
                         row.Password = dbReader.GetValue(4).ToString();
                         if(login.Password == row.Password)
                         {
+                            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@123"));
+                            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                            var tokenOptions = new JwtSecurityToken(
+                                issuer: "https://localhost:44309",
+                                audience: "https://localhost:44309",
+                                claims: new List<Claim>(),
+                                expires: DateTime.Now.AddMonths(2),
+                                signingCredentials: signingCredentials
+                                );
+                            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                            row.token=new { Token = tokenString};
                             list.Add(row);
                         }
                     }
