@@ -239,7 +239,6 @@ namespace LibraryAPI.Controllers
                             inner join Language on Book.LangId=Language.LangId";
             string serverConnectionString = _configuration.GetConnectionString("LibrarySqlServerConnectionCredentials");
             SqlDataReader sqlDataReader;
-            long i = 0;
             List<RequestBooksModel> list = new List<RequestBooksModel>();
             using(SqlConnection serverConnection = new SqlConnection(serverConnectionString))
             {
