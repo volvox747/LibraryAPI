@@ -22,7 +22,6 @@ C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\staticwebassets\
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\LibraryAPI.RazorTargetAssemblyInfo.cache
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\LibraryAPI.csproj.CopyComplete
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\LibraryAPI.dll
-C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\refint\LibraryAPI.dll
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\LibraryAPI.pdb
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\LibraryAPI.genruntimeconfig.cache
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\ref\LibraryAPI.dll
@@ -39,3 +38,5 @@ C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\bin\Debug\net5.0\Microsoft.Identi
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\bin\Debug\net5.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\bin\Debug\net5.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\bin\Debug\net5.0\ref\LibraryAPI.dll
+C:\Users\tbenson\Desktop\LibraryAPI\LibraryAPI\obj\Debug\net5.0\staticwebassets\LibraryAPI.StaticWebAssets.xml
